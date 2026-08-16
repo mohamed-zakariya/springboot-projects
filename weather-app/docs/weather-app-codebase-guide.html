@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Weather App Spring Boot Codebase Guide</title>
+  <style>
+    :root {
+      --ink: #1f2933;
+      --muted: #627386;
+      --line: #d7dee8;
+      --panel: #f5f8fb;
+      --accent: #006d77;
+      --accent-soft: #e3f4f3;
+      --code: #18202a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 38px 44px 54px;
+    }
+
+    .cover {
+      padding: 42px 0 28px;
+      border-bottom: 4px solid var(--accent);
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 34px;
+      line-height: 1.12;
+      margin: 0 0 12px;
+      color: #12222d;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    h2 {
+      margin: 30px 0 12px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--line);
+      color: #172633;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    h3 {
+      margin: 22px 0 8px;
+      color: #233446;
+      font-size: 16px;
+    }
+
+    p {
+      margin: 7px 0 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 14px 22px;
+      padding: 0;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    code {
+      color: var(--code);
+      background: #eef3f7;
+      border: 1px solid #d9e2ea;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12.5px;
+    }
+
+    pre {
+      margin: 12px 0 16px;
+      padding: 13px 15px;
+      overflow: hidden;
+      color: #17212b;
+      background: #f0f4f8;
+      border: 1px solid #d7dee8;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      margin: 12px 0 18px;
+      border-collapse: collapse;
+      font-size: 12.6px;
+    }
+
+    th,
+    td {
+      vertical-align: top;
+      border: 1px solid var(--line);
+      padding: 8px 9px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--accent-soft);
+      color: #16313a;
+    }
+
+    .callout {
+      margin: 14px 0;
+      padding: 12px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+    }
+
+    .mental-model {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 16px 0 18px;
+    }
+
+    .box {
+      min-height: 86px;
+      padding: 12px;
+      background: #f7fafc;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .box strong {
+      display: block;
+      color: #14333a;
+      margin-bottom: 5px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12.2px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .toc {
+      columns: 2;
+      column-gap: 30px;
+      padding-left: 20px;
+    }
+
+    .toc li {
+      break-inside: avoid;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 15mm 14mm;
+      }
+
+      body {
+        font-size: 11.5px;
+      }
+
+      .page {
+        max-width: none;
+        padding: 0;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+
+      h2 {
+        break-after: avoid;
+        font-size: 18px;
+      }
+
+      h3,
+      table,
+      pre,
+      .callout,
+      .box {
+        break-inside: avoid;
+      }
+
+      .mental-model,
+      .two-col {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="cover">
+      <div class="eyebrow">Spring Boot Learning Guide</div>
+      <h1>Weather App Codebase Explained</h1>
+      <p class="subtitle">
+        A practical mental model of the existing Spring Boot project: REST controllers, services,
+        DTO mapping, external Weather API calls, Redis caching, configuration, and request flow.
+      </p>
+    </section>
+
+    <h2>Table of Contents</h2>
+    <ol class="toc">
+      <li>High-level overview</li>
+      <li>Project and package structure</li>
+      <li>Important classes</li>
+      <li>Class dependencies</li>
+      <li>Spring Boot architecture</li>
+      <li>Request trace: GET /api/weather/Alexandria</li>
+      <li>External Weather API mapping</li>
+      <li>Redis caching</li>
+      <li>Configuration</li>
+      <li>Gradle dependencies</li>
+      <li>Patterns used</li>
+      <li>Architecture diagram</li>
+      <li>10 concepts to learn</li>
+    </ol>
+
+    <h2>1. High-Level Overview</h2>
+    <p>
+      This project is a Spring Boot REST API that returns weather forecast data for a city.
+      A client calls <code>GET /api/weather/{city}</code>, the app requests forecast data from
+      the Visual Crossing Weather API, maps that response into simpler DTOs, returns JSON, and
+      caches the result in Redis for 10 minutes.
+    </p>
+    <div class="mental-model">
+      <div class="box"><strong>Controller</strong>Receives HTTP requests and delegates work.</div>
+      <div class="box"><strong>Service</strong>Calls the external API and maps weather data.</div>
+      <div class="box"><strong>DTOs</strong>Shape incoming and outgoing JSON data.</div>
+      <div class="box"><strong>Redis</strong>Stores repeated weather results temporarily.</div>
+    </div>
+
+    <h2>2. Project and Package Structure</h2>
+    <pre>weather-app
+|-- build.gradle
+|-- settings.gradle
+|-- src
+    |-- main
+    |   |-- java/com/example/weather/app
+    |   |   |-- WeatherAppApplication.java
+    |   |   |-- config
+    |   |   |   `-- RedisConfig.java
+    |   |   |-- controller
+    |   |   |   |-- weatherController.java
+    |   |   |   `-- CacheController.java
+    |   |   |-- dto
+    |   |   |   |-- WeatherApiResponse.java
+    |   |   |   |-- WeatherResponseDTO.java
+    |   |   |   |-- HourlyForecastDTO.java
+    |   |   |   |-- DailyForecastDTO.java
+    |   |   |   `-- LocationDTO.java
+    |   |   |-- model
+    |   |   |-- repository
+    |   |   `-- service
+    |   |       |-- WeatherService.java
+    |   |       `-- RedisCacheService.java
+    |   `-- resources
+    |       |-- application.properties
+    |       |-- static
+    |       `-- templates
+    `-- test/java/com/example/weather/app
+        `-- WeatherAppApplicationTests.java</pre>
+
+    <table>
+      <tr><th>Package / Folder</th><th>Responsibility</th></tr>
+      <tr><td><code>com.example.weather.app</code></td><td>Root package. Spring scans this package and its subpackages.</td></tr>
+      <tr><td><code>config</code></td><td>Infrastructure configuration, currently Redis cache setup.</td></tr>
+      <tr><td><code>controller</code></td><td>REST API layer. Receives HTTP requests and returns responses.</td></tr>
+      <tr><td><code>service</code></td><td>Business logic layer. Calls external APIs, maps data, and provides Redis helper logic.</td></tr>
+      <tr><td><code>dto</code></td><td>Data Transfer Objects used for external API input shape and internal API response shape.</td></tr>
+      <tr><td><code>model</code></td><td>Empty right now. Usually used for domain/database entities.</td></tr>
+      <tr><td><code>repository</code></td><td>Empty right now. No database repository layer is currently implemented.</td></tr>
+      <tr><td><code>resources</code></td><td>Application properties and optional static/template resources.</td></tr>
+    </table>
+
+    <h2>3. Important Classes</h2>
+    <h3>WeatherAppApplication</h3>
+    <p>
+      <strong>What:</strong> The application entry point.
+      <strong>Why:</strong> Spring Boot needs a bootstrap class.
+      <strong>How:</strong> <code>SpringApplication.run(...)</code> starts the Spring container and embedded server.
+    </p>
+    <p>
+      <code>@SpringBootApplication</code> enables auto-configuration and component scanning.
+      <code>@EnableCaching</code> enables annotation-based caching, which makes <code>@Cacheable</code> work.
+    </p>
+
+    <h3>weatherController</h3>
+    <p>
+      <strong>What:</strong> REST controller for weather endpoints.
+      <strong>Why:</strong> It exposes weather functionality through HTTP.
+      <strong>How:</strong> The base path is <code>/api/weather</code>. The method
+      <code>getWeather(@PathVariable String city)</code> handles <code>GET /api/weather/{city}</code>.
+    </p>
+
+    <h3>WeatherService</h3>
+    <p>
+      <strong>What:</strong> Main business service.
+      <strong>Why:</strong> It keeps external API calls, mapping, temperature conversion, and caching away from the controller.
+      <strong>How:</strong> It reads configuration with <code>@Value</code>, calls Visual Crossing with
+      <code>RestTemplate</code>, maps the result into <code>WeatherResponseDTO</code>, and returns it.
+    </p>
+
+    <h3>RedisConfig</h3>
+    <p>
+      <strong>What:</strong> Redis cache configuration.
+      <strong>Why:</strong> The app needs to define how cached values are stored and how long they live.
+      <strong>How:</strong> It creates a <code>RedisCacheManager</code> with a 10-minute TTL and JSON value serialization.
+    </p>
+
+    <h3>CacheController and RedisCacheService</h3>
+    <p>
+      <strong>What:</strong> A small debugging path for viewing Redis keys.
+      <strong>Why:</strong> It helps you see what cache entries exist.
+      <strong>How:</strong> <code>GET /cache/keys</code> calls <code>RedisCacheService.getAllKeys()</code>, which uses
+      <code>RedisTemplate.keys("*")</code>.
+    </p>
+
+    <h3>DTO Classes</h3>
+    <table>
+      <tr><th>DTO</th><th>Purpose</th></tr>
+      <tr><td><code>WeatherApiResponse</code></td><td>Represents the JSON shape returned by Visual Crossing.</td></tr>
+      <tr><td><code>WeatherResponseDTO</code></td><td>Represents the clean JSON response returned by your API.</td></tr>
+      <tr><td><code>HourlyForecastDTO</code></td><td>Represents one hourly forecast item.</td></tr>
+      <tr><td><code>DailyForecastDTO</code></td><td>Represents one daily forecast item.</td></tr>
+      <tr><td><code>LocationDTO</code></td><td>Currently unused.</td></tr>
+    </table>
+
+    <h2>4. Class Dependencies</h2>
+    <pre>weatherController
+  -> WeatherService
+
+WeatherService
+  -> WeatherApiResponse
+  -> WeatherResponseDTO
+  -> HourlyForecastDTO
+  -> DailyForecastDTO
+  -> RestTemplate
+  -> application.properties values
+
+CacheController
+  -> RedisCacheService
+
+RedisCacheService
+  -> RedisTemplate&lt;String, Object&gt;
+
+RedisConfig
+  -> RedisConnectionFactory
+  -> creates RedisCacheManager
+  -> creates RedisTemplate</pre>
+    <p>
+      The important idea: most objects are not manually created by your own code. Spring creates them,
+      manages them as beans, and injects them where needed.
+    </p>
+
+    <h2>5. Spring Boot Architecture</h2>
+    <h3>Controllers</h3>
+    <p>
+      <strong>What:</strong> Classes that handle HTTP requests.
+      <strong>Why:</strong> They form the public API boundary.
+      <strong>How here:</strong> <code>weatherController</code> handles weather routes and
+      <code>CacheController</code> handles cache key inspection.
+    </p>
+
+    <h3>Services</h3>
+    <p>
+      <strong>What:</strong> Classes that contain business logic.
+      <strong>Why:</strong> Controllers should stay small and delegate real work.
+      <strong>How here:</strong> <code>WeatherService</code> owns weather fetching and mapping.
+      <code>RedisCacheService</code> owns direct Redis access for key lookup.
+    </p>
+
+    <h3>DTOs</h3>
+    <p>
+      <strong>What:</strong> Simple objects used to transfer data.
+      <strong>Why:</strong> They keep external API shape separate from your own API response shape.
+      <strong>How here:</strong> <code>WeatherApiResponse</code> is the external shape; <code>WeatherResponseDTO</code>
+      is your API response shape.
+    </p>
+
+    <h3>Dependency Injection and Beans</h3>
+    <p>
+      <strong>What:</strong> Spring provides objects to classes automatically.
+      <strong>Why:</strong> It reduces manual setup and lets Spring manage lifecycles, proxies, and configuration.
+      <strong>How here:</strong> <code>@Service</code>, <code>@RestController</code>, <code>@Configuration</code>, and
+      <code>@Bean</code> all create Spring-managed objects.
+    </p>
+
+    <h3>Repositories</h3>
+    <p>
+      The <code>repository</code> package exists but is empty. There is no database access layer in the current application.
+    </p>
+
+    <h2>6. Request Trace: GET /api/weather/Alexandria</h2>
+    <ol>
+      <li>The HTTP request enters Spring Boot's embedded web server.</li>
+      <li>Spring MVC finds <code>weatherController</code> because it has <code>@RequestMapping("/api/weather")</code>.</li>
+      <li>Spring matches <code>@GetMapping("/{city}")</code>.</li>
+      <li>Spring extracts <code>Alexandria</code> from the URL and passes it as <code>city</code>.</li>
+      <li>The controller calls <code>weatherService.getWeather(city)</code>.</li>
+      <li>Because <code>getWeather</code> has <code>@Cacheable</code>, Spring checks Redis first.</li>
+      <li>The cache key is calculated as <code>city.toLowerCase()</code>, so <code>Alexandria</code> becomes <code>alexandria</code>.</li>
+      <li>If Redis has the value, Spring returns it without running the method body.</li>
+      <li>If Redis does not have the value, <code>WeatherService.getWeather("Alexandria")</code> runs.</li>
+      <li>The service builds the Visual Crossing URL and calls it using <code>RestTemplate</code>.</li>
+      <li>Jackson maps the external JSON into <code>WeatherApiResponse</code>.</li>
+      <li>The service maps that object into <code>WeatherResponseDTO</code>.</li>
+      <li>The response is cached in Redis for 10 minutes.</li>
+      <li>Spring MVC serializes the DTO to JSON and returns it to the client.</li>
+    </ol>
+
+    <h2>7. External Weather API Mapping</h2>
+    <p>
+      The external API call is built from values in <code>application.properties</code>:
+    </p>
+    <pre>String url = baseUrl + "/" + city + "?key=" + apiKEY;</pre>
+    <p>
+      Then the service calls:
+    </p>
+    <pre>WeatherApiResponse weatherApiResponse =
+    restTemplate.getForObject(url, WeatherApiResponse.class);</pre>
+    <p>
+      Spring uses Jackson to convert JSON fields into Java fields with matching names.
+      The service then performs manual mapping:
+    </p>
+    <table>
+      <tr><th>External Field</th><th>Internal DTO Field</th></tr>
+      <tr><td><code>resolvedAddress</code></td><td><code>WeatherResponseDTO.location</code></td></tr>
+      <tr><td><code>days[0].hours[].datetime</code></td><td><code>HourlyForecastDTO.time</code></td></tr>
+      <tr><td><code>days[0].hours[].temp</code></td><td><code>HourlyForecastDTO.temp</code>, converted to Celsius</td></tr>
+      <tr><td><code>days[0].hours[].conditions</code></td><td><code>HourlyForecastDTO.condition</code></td></tr>
+      <tr><td><code>days[].datetime</code></td><td><code>DailyForecastDTO.date</code></td></tr>
+      <tr><td><code>days[].tempmin/tempmax/temp</code></td><td>Daily temperature fields, converted to Celsius</td></tr>
+      <tr><td><code>days[].conditions</code></td><td><code>DailyForecastDTO.condition</code></td></tr>
+    </table>
+
+    <h2>8. Redis Caching</h2>
+    <h3>Where Redis is configured</h3>
+    <p>
+      Redis host and port are in <code>application.properties</code>. Cache behavior is in <code>RedisConfig</code>.
+    </p>
+    <pre>spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.cache.type=redis</pre>
+
+    <h3>How Spring connects to Redis</h3>
+    <p>
+      Because the project includes <code>spring-boot-starter-data-redis</code>, Spring Boot auto-creates a
+      <code>RedisConnectionFactory</code> from the Redis properties. <code>RedisConfig</code> uses that connection factory
+      to create the cache manager and Redis template.
+    </p>
+
+    <h3>What @Cacheable does</h3>
+    <p>
+      <code>@Cacheable</code> wraps the method with caching behavior. Before the method body runs,
+      Spring checks the cache. If a value exists, it returns the cached value. If not, the method runs
+      and the result is stored.
+    </p>
+    <pre>@Cacheable(value = "weather", key = "#city.toLowerCase()")</pre>
+
+    <h3>Cache key, hit, and miss</h3>
+    <ul>
+      <li><strong>Cache name:</strong> <code>weather</code></li>
+      <li><strong>Method key:</strong> lowercase city name</li>
+      <li><strong>For Alexandria:</strong> <code>alexandria</code></li>
+      <li><strong>Typical Redis key:</strong> <code>weather::alexandria</code></li>
+      <li><strong>Cache hit:</strong> Redis returns the cached DTO and the external API is not called.</li>
+      <li><strong>Cache miss:</strong> The service calls Visual Crossing, maps the data, stores the result, and returns it.</li>
+    </ul>
+
+    <h2>9. Configuration</h2>
+    <table>
+      <tr><th>Property</th><th>Purpose</th><th>Used By</th></tr>
+      <tr><td><code>spring.application.name</code></td><td>Names the application.</td><td>Spring Boot metadata/logging.</td></tr>
+      <tr><td><code>weather.api.base-url</code></td><td>Base URL for Visual Crossing.</td><td><code>WeatherService.baseUrl</code> using <code>@Value</code>.</td></tr>
+      <tr><td><code>weather.api.key</code></td><td>API key for Visual Crossing.</td><td><code>WeatherService.apiKEY</code> using <code>@Value</code>.</td></tr>
+      <tr><td><code>spring.data.redis.host</code></td><td>Redis hostname.</td><td>Spring Boot Redis auto-configuration.</td></tr>
+      <tr><td><code>spring.data.redis.port</code></td><td>Redis port.</td><td>Spring Boot Redis auto-configuration.</td></tr>
+      <tr><td><code>spring.cache.type</code></td><td>Selects Redis as cache provider.</td><td>Spring Cache auto-configuration.</td></tr>
+      <tr><td><code>logging.level.org.springframework.cache</code></td><td>Enables detailed cache logs.</td><td>Spring logging system.</td></tr>
+    </table>
+    <div class="callout">
+      In production, API keys are usually not stored directly in committed property files.
+      They are usually supplied through environment variables, secret managers, or deployment configuration.
+    </div>
+
+    <h2>10. Gradle Dependencies</h2>
+    <table>
+      <tr><th>Dependency</th><th>Why it exists</th></tr>
+      <tr><td><code>spring-boot-starter-web</code></td><td>Provides Spring MVC, embedded server, REST controller support, JSON serialization, and HTTP client basics.</td></tr>
+      <tr><td><code>spring-boot-starter-data-redis</code></td><td>Provides Redis integration, <code>RedisTemplate</code>, Redis connection factory, and cache support.</td></tr>
+      <tr><td><code>lombok</code></td><td>Generates getters and setters for DTOs at compile time.</td></tr>
+      <tr><td><code>spring-boot-starter-test</code></td><td>Provides Spring Boot testing tools and JUnit support.</td></tr>
+      <tr><td><code>junit-platform-launcher</code></td><td>Runtime support for launching JUnit tests.</td></tr>
+    </table>
+
+    <h2>11. Design and Architectural Patterns</h2>
+    <ul>
+      <li><strong>Layered architecture:</strong> Controller -> Service -> External API/Redis.</li>
+      <li><strong>DTO pattern:</strong> Separate objects for external API input shape and your API output shape.</li>
+      <li><strong>Dependency Injection:</strong> Spring provides services and infrastructure objects.</li>
+      <li><strong>Configuration pattern:</strong> Properties and configuration classes separate settings from logic.</li>
+      <li><strong>Proxy-based caching:</strong> Spring wraps the service method and adds cache behavior around it.</li>
+      <li><strong>Adapter / mapper style:</strong> The service adapts Visual Crossing's response into your own response model.</li>
+    </ul>
+
+    <h2>12. Architecture Diagram</h2>
+    <pre>Client
+  |
+  | GET /api/weather/Alexandria
+  v
+Spring MVC Dispatcher
+  |
+  v
+weatherController
+  |
+  | calls getWeather(city)
+  v
+Spring Cache Proxy
+  |
+  | checks key weather::alexandria
+  v
+Redis
+  |
+  | cache miss
+  v
+WeatherService
+  |
+  | RestTemplate HTTP GET
+  v
+Visual Crossing Weather API
+  |
+  | JSON response
+  v
+WeatherApiResponse
+  |
+  | manual mapping
+  v
+WeatherResponseDTO
+  |
+  v
+JSON response to Client</pre>
+
+    <h2>13. 10 Concepts to Learn, Beginner to Advanced</h2>
+    <ol>
+      <li>Java package organization and project structure.</li>
+      <li>Spring Boot startup with <code>@SpringBootApplication</code>.</li>
+      <li>REST endpoints with <code>@RestController</code>, <code>@RequestMapping</code>, <code>@GetMapping</code>, and <code>@PathVariable</code>.</li>
+      <li>Service classes with <code>@Service</code>.</li>
+      <li>Dependency Injection and the difference between field injection and constructor injection.</li>
+      <li>DTOs and why APIs use separate request/response objects.</li>
+      <li>Calling external APIs with <code>RestTemplate</code>.</li>
+      <li>Mapping external JSON into Java objects and then into your own DTOs.</li>
+      <li>Application configuration with <code>application.properties</code> and <code>@Value</code>.</li>
+      <li>Redis caching with <code>@EnableCaching</code>, <code>@Cacheable</code>, cache keys, TTL, and <code>RedisCacheManager</code>.</li>
+    </ol>
+
+    <p class="footer-note">
+      Generated for the existing codebase in <code>D:\Projects\springboot\project1\weather-app-spring\weather-app</code>.
+      This document explains the current project as inspected; it does not change application behavior.
+    </p>
+  </main>
+</body>
+</html>
