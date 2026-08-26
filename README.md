@@ -80,7 +80,7 @@ Once the application is running, you can interact with it through the command-li
 ### Original Project Reference
 
 This implementation follows the specifications and requirements from:
-[https://roadmap.sh/projects/task-tracker](https://roadmap.sh/projects/task-tracker)
+https://roadmap.sh/projects/task-tracker
 
 ### Contributing
 
