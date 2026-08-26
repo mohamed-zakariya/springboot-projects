@@ -1,6 +1,4 @@
-# springboot-projects
-
-## Task Tracker Application
+# Task Tracker Application
 
 A Spring Boot application built following the [roadmap.sh Task Tracker](https://roadmap.sh/projects/task-tracker) project specification.
 
