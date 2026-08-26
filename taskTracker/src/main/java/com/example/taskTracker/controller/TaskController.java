@@ -33,7 +33,7 @@ public class TaskController {
             @RequestParam(required = false) TaskStatus status) {
 
         if (status != null) {
-            return ResponseEntity.ok(taskService.getTasksByStatus(status));
+            return ResponseEntity.ok(taskService.getTasks(status));
         }
 
         return ResponseEntity.ok(taskService.getTasks());
@@ -49,9 +49,8 @@ public class TaskController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable long id,
-                                           @RequestParam String description,
-                                           @RequestParam TaskStatus taskStatus){
-        Task task = taskService.updateTask(id, description, taskStatus);
+                                           @RequestParam String description){
+        Task task = taskService.updateTask(id, description);
         if (task != null){
             return ResponseEntity.ok(task);
         }

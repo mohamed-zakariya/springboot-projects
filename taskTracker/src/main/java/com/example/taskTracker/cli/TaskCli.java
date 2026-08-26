@@ -10,6 +10,12 @@ import picocli.CommandLine;
         mixinStandardHelpOptions = true,
         subcommands = {
                 AddCommand.class,
+                DeleteCommand.class,
+                UpdateCommand.class,
+                MarkTodoCommand.class,
+                MarkInProgressCommand.class,
+                MarkDoneCommand.class,
+                ListCommand.class
         }
 
 )

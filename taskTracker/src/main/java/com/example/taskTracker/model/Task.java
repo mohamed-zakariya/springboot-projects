@@ -16,5 +16,20 @@ public class Task {
      private LocalDateTime createdAt;
      private LocalDateTime updatedAt;
 
-
+     @Override
+     public String toString() {
+          return """
+           ID: %d
+           Description: %s
+           Status: %s
+           Created At: %s
+           Updated At: %s
+           """.formatted(
+                  id,
+                  description,
+                  status,
+                  createdAt,
+                  updatedAt
+          );
+     }
 }

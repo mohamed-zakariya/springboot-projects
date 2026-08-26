@@ -3,6 +3,7 @@ package com.example.taskTracker.service;
 import com.example.taskTracker.enums.TaskStatus;
 import com.example.taskTracker.model.Task;
 import lombok.Getter;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,11 @@ public class TaskService {
 
     public TaskService(TaskJsonStorage storage) {
         this.storage = storage;
+    }
+
+    @PostConstruct
+    void loadTasks() {
+        tasks.addAll(storage.loadTasks());
     }
 
     public Long generateNextId(List<Task> tasks){
@@ -57,13 +63,16 @@ public class TaskService {
         return remove;
     }
 
-    public List<Task> getTasksByStatus(TaskStatus taskStatus){
+    public List<Task> getTasks(TaskStatus taskStatus){
+        if(taskStatus == null){
+            return tasks;
+        }
         return tasks.stream()
                 .filter(task -> task.getStatus() == taskStatus)
                 .toList();
     }
 
-    public Task updateTask(Long id, String description, TaskStatus taskStatus){
+    public Task updateTask(Long id, String description){
         Task task = tasks.stream()
                 .filter(t -> t.getId().equals(id))
                 .findFirst()
@@ -75,14 +84,27 @@ public class TaskService {
         if(description != null){
             task.setDescription(description);
         }
-        if (taskStatus != null){
-            task.setStatus(taskStatus);
-        }
+
         task.setUpdatedAt(LocalDateTime.now());
 
         storage.saveTasks(tasks);
         return task;
 
+    }
+
+    public Task updateTaskStatus(Long id, TaskStatus taskStatus){
+        Task task = tasks.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+        if(task == null) {
+            return null;
+        }
+        task.setStatus(taskStatus);
+        task.setUpdatedAt(LocalDateTime.now());
+
+        storage.saveTasks(tasks);
+        return task;
     }
 
 

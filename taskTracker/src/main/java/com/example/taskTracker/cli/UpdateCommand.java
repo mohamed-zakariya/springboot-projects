@@ -27,8 +27,7 @@ public class UpdateCommand implements Runnable {
 
         Task task = taskService.updateTask(
                 id,
-                description,
-                null
+                description
         );
 
         if (task != null) {
